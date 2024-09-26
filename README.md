@@ -18,5 +18,4 @@ Nonetheless, this is a reasonably competent attempt that is primed for your impr
 
 As stated within the scripts, you will need an OpenAI API key to run 01 and 02. You will also need to know how to work with Python and what `pip install yt_dlp ffmpeg-python openai==1.48 tqdm` means. If you sufficiently desire, raise an [issue](https://github.com/nurmister/YTTranscriber/issues) and I can probably help you solve technical issues.
 
-If you've found this repository, these are probably trivialities. In case you wish to contribute to this small project, I would appreciate a pull request integrating [a local copy of Whisper](https://github.com/openai/whisper) into 01. While summarization (more correctly, chat completion) API calls are cheap, Whisper isn't really.
-
+If you've found this repository, these are probably trivialities. In case you wish to contribute to this small project, I would appreciate a pull request integrating [a local copy of Whisper](https://github.com/openai/whisper) into 01. While summarization (more correctly, chat completion) API calls are cheap, Whisper isn't really. The API also accepts audio of only 25 MB (which equates to about two hours at 32 kbps) with the efficient Ogg format downloaded by 00.
