@@ -30,6 +30,7 @@ Optional Arguments:
 
 Dependencies:
     - openai==1.48
+    - tqdm
     - python-dotenv (optional, for loading environment variables from a .env file)
 
 Environment Variables:
@@ -56,6 +57,13 @@ try:
 except ImportError:
     print("Error: The 'openai' library is not installed. Install it using "
           "'pip install openai==1.48'.")
+    sys.exit(1)
+
+try:
+    from tqdm import tqdm
+except ImportError:
+    print("Error: The 'tqdm' library is not installed. Install it using "
+          "'pip install tqdm'.")
     sys.exit(1)
 
 
@@ -273,33 +281,32 @@ def generate_summary_for_chunk(api_key,
     """
     client = openai.OpenAI(api_key=api_key)
     try:
-        print("Generating chunk summary...")
         # Define system message based on summarization type and verbosity
         system_content = (
             "You are a precise AI assistant that summarizes transcriptions of spoken content. "
             "The transcription may involve multiple speakers. "
             "Don't waste words with filler like "
-            "\"in this transcription...\", \"the speaker says...\"."
+            "\"in this transcription...\", or \"the speaker says...\", etc."
         )
         if summarization_type == "extractive":
             system_content += (
-                "Provide an extractive summary, focusing on the key points and main "
-                "ideas directly from the text. "
+                " Provide an extractive summary, focusing on the key points and main "
+                "ideas directly from the text."
             )
         else:
             system_content += (
-                "Provide an abstractive summary, paraphrasing and revealing the main "
-                "ideas in your own words. "
+                " Provide an abstractive summary, paraphrasing and revealing the main "
+                "ideas in your own words."
             )
 
         if verbosity == "verbose":
             system_content += (
-                "Ensure that the summary is detailed with minimal compression, "
+                " Ensure that the summary is detailed with minimal compression, "
                 "covering all essential aspects comprehensively."
             )
         else:
             system_content += (
-                "Ensure that the summary is concise and succinct, capturing the main "
+                " Ensure that the summary is concise and succinct, capturing the main "
                 "points effectively with minimal words."
             )
 
@@ -313,7 +320,6 @@ def generate_summary_for_chunk(api_key,
             temperature=0.5,
         )
         summary = response.to_dict()["choices"][0]["message"]["content"].strip()
-        print("Summary for chunk generated successfully.")
         return summary
     except openai.AuthenticationError:
         print("Error: Authentication failed. Check your OpenAI API key.")
@@ -348,8 +354,7 @@ def generate_full_summary(api_key,
     print(f"Transcription split into {len(chunks)} chunks.")
 
     chunk_summaries = []
-    for idx, chunk in enumerate(chunks, 1):
-        print(f"Processing chunk {idx}/{len(chunks)}...")
+    for chunk in tqdm(chunks, desc="Processing chunks", unit="chunk"):
         summary = generate_summary_for_chunk(
             api_key, chunk, summarization_type, verbosity
         )
@@ -415,7 +420,7 @@ def main():
     summary_directory.mkdir(parents=True, exist_ok=True)
 
     # Define summary file path
-    summary_filename = transcription_path.stem + ".txt"
+    summary_filename = f"{transcription_path.stem}_{summarization_type}_{verbosity}.txt"
     summary_path = summary_directory / summary_filename
 
     # Save the summary
