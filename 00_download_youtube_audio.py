@@ -2,7 +2,7 @@
 """
 00_download_youtube_audio.py
 
-A script to download the highest-quality FLAC audio from a YouTube video and convert it to Opus format.
+A script to download the highest-quality FLAC audio from a YouTube video and convert it to Ogg format.
 
 Usage:
     python 00_download_youtube_audio.py <YouTube_URL> <Name> [Directory] [--bitrate BITRATE]
@@ -13,7 +13,7 @@ Positional Arguments:
     Directory     The directory to save the audio files (optional, defaults to "audio").
 
 Optional Arguments:
-    --bitrate BITRATE   The bitrate for the Opus conversion in kbps (default: 32).
+    --bitrate BITRATE   The bitrate for the Ogg conversion in kbps (default: 32).
 
 Dependencies:
     - yt_dlp
@@ -49,7 +49,7 @@ except ImportError:
 def parse_arguments():
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="Download highest-quality FLAC audio from a YouTube URL and convert it to Opus format."
+        description="Download highest-quality FLAC audio from a YouTube URL and convert it to Ogg format."
     )
     parser.add_argument("youtube_url", help="The URL of the YouTube video.")
     parser.add_argument("name", help="The desired name for the output files (without extension).")
@@ -63,7 +63,7 @@ def parse_arguments():
         "--bitrate",
         type=int,
         default=32,
-        help="The bitrate for the Opus conversion in kbps (default: 32).",
+        help="The bitrate for the Ogg conversion in kbps (default: 32).",
     )
     return parser.parse_args()
 
@@ -109,25 +109,25 @@ def download_audio(youtube_url, output_base_path):
             sys.exit(1)
 
 
-def convert_flac_to_opus(flac_path, opus_path, bitrate):
+def convert_flac_to_ogg(flac_path, ogg_path, bitrate):
     """
-    Convert a FLAC file to Opus format with specified parameters.
+    Convert a FLAC file to Ogg format with specified parameters.
 
     Args:
         flac_path (str): Path to the input FLAC file.
-        opus_path (str): Path to save the output Opus file.
-        bitrate (int): Bitrate for the Opus conversion in kbps.
+        ogg_path (str): Path to save the output Ogg file.
+        bitrate (int): Bitrate for the Ogg conversion in kbps.
 
     Raises:
         ffmpeg.Error: If conversion fails.
     """
-    print(f"Converting {flac_path} to Opus format with bitrate {bitrate} kbps...")
+    print(f"Converting {flac_path} to Ogg format with bitrate {bitrate} kbps...")
     try:
         (
             ffmpeg
             .input(flac_path)
             .output(
-                opus_path,
+                ogg_path,
                 audio_bitrate=f'{bitrate}k',
                 # Whisper-1 converts audio to Mono 16kHz.
                 ar='16000',
@@ -137,7 +137,7 @@ def convert_flac_to_opus(flac_path, opus_path, bitrate):
             .overwrite_output()
             .run(quiet=True)
         )
-        print(f"Conversion successful. Opus file saved to {opus_path}.")
+        print(f"Conversion successful. Ogg file saved to {ogg_path}.")
     except ffmpeg.Error as e:
         print(f"Error during conversion: {e.stderr.decode()}")
         sys.exit(1)
@@ -173,13 +173,13 @@ def main():
 
     # Define file paths
     flac_path = f"{output_base}.flac"
-    opus_path = f"{output_base}.opus"
+    ogg_path = f"{output_base}.ogg"
 
     # Download the audio as FLAC
     download_audio(youtube_url, output_base)
 
-    # Convert FLAC to Opus
-    convert_flac_to_opus(flac_path, opus_path, bitrate)
+    # Convert FLAC to Ogg
+    convert_flac_to_ogg(flac_path, ogg_path, bitrate)
 
     # Delete the FLAC file after successful conversion
     try:
